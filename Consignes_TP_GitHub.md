@@ -1,4 +1,4 @@
-# Consignes de réalisation et de dépôt des TP sur GitHub
+# Consignes de réalisation et de dépôt des TP/TD sur GitHub
 
 ## 1. Objectif
 
