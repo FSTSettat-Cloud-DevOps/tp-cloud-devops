@@ -49,8 +49,7 @@ vagrant box list
 
 **Capture d'écran — liste des boxes :**
 
-![Capture : vagrant box list](captures/01-vagrant-box-list.png)
-
+![Liste des boxes](../captures/01-vagrant-box-list.png)
 > Déposez votre capture dans le dossier `captures/` avec le nom `01-vagrant-box-list.png`. Adaptez le chemin de l'image si nécessaire.
 
 ### 2.3 Question de réflexion — modèle IaaS
@@ -92,7 +91,7 @@ vagrant status
 
 **Capture d'écran — état de la VM :**
 
-![Capture : vagrant status](captures/02-vagrant-status.png)
+![Capture : vagrant status](../captures/02-vagrant-status.png)
 
 ### 3.3 Identification de l'utilisateur et de la machine
 
@@ -112,8 +111,7 @@ hostname -I
 
 **Capture d'écran — identité de la VM :**
 
-![Capture : utilisateur, nom et IP](captures/03-identite-vm.png)
-
+![Identité de la VM](../captures/03-identite-vm.png)
 ### 3.4 Ressources virtuelles
 
 Commandes exécutées :
@@ -137,7 +135,8 @@ Complétez le tableau à partir des résultats réellement affichés.
 
 **Capture d'écran — ressources de la VM :**
 
-![Capture : ressources de la VM](captures/04-ressources-vm.png)
+![Ressources de la VM](../captures/04-ressources-vm.png)
+
 
 ### 3.5 Interprétation
 
@@ -177,7 +176,7 @@ sudo netstat -tlnp | grep :22
 - **Le port 22 est-il en écoute ?** Oui, le test depuis Windows affiche TcpTestSucceeded : True.
 -**Capture d'écran — état du serveur SSH :**
 
-![Capture : service SSH](captures/05-ssh-status.png)
+![État du service SSH](../captures/05-ssh-status.png)
 
 ### 4.3 Test SSH depuis le système hôte
 
@@ -193,7 +192,7 @@ ssh vagrant@192.168.56.110
 
 **Capture d'écran — test de connectivité :**
 
-![Capture : ping et test du port 22](captures/06-tests-reseau-ssh.png)
+![Tests réseau et SSH](../captures/06-tests-reseau-ssh.png)
 
 Sur Windows, les commandes utiles sont :
 
@@ -303,7 +302,8 @@ sudo ufw status numbered
 **Capture d'écran — règles UFW :** 8080/tcp (v6) DENY IN Anywhere (v6)
 **explicitement bloqué** pour toutes les connexions entrantes, en IPv4 et IPv6. Toute tentative de connexion sur ce port sera rejetée par le pare-feu.
 
-![Capture : règles UFW](captures/07-ufw-regles.png)
+![Règles UFW](../captures/07-ufw-regles.png)
+
 
 **Question :** Pourquoi est-il nécessaire de conserver une règle autorisant le port 22 lorsque l'administration de la VM est réalisée par SSH ?
 
@@ -337,7 +337,8 @@ groups operateur-cloud
 
 **Capture d'écran — utilisateur et groupe :**operateur-cloud : operateur-cloud cloud-admin (L'utilisateur appartient à son groupe personnel par défaut, ainsi qu'au nouveau groupe cloud-admin).
 
-![Capture : création utilisateur et groupe](captures/08-utilisateur-groupe.png)
+![Utilisateur et groupe](../captures/08-utilisateur-groupe.png)
+
 
 **Question :** En quoi cette manipulation illustre-t-elle le principe du moindre privilège ?
 
@@ -420,11 +421,11 @@ hostname -I
 
 **Capture d'écran — déploiement (`vagrant up`) :**
 
-![Capture : vagrant up](captures/09-vagrant-up.png)
+![Vagrant up](../captures/09-vagrant-up.png)
 
 **Capture d'écran — connexion (`vagrant ssh`) :**
 
-![Capture : vagrant ssh](captures/10-vagrant-ssh.png)
+![Vagrant SSH](../captures/10-vagrant-ssh.png)
 
 ### 6.4 Arrêt et suppression
 
