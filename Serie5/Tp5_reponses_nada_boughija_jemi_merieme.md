@@ -7,7 +7,7 @@
 |---|---|
 | **Nom** | *Boughija_jemi* |
 | **Prénom** | *Nada_Meriem* |
-| **Groupe / Filière** | *(à compléter)* |
+| **Groupe / Filière** | *IRISTI* |
 | **Date** | *02/11/2026* |
 
 ---
@@ -247,26 +247,65 @@ Coller ici la sortie de la commande de l'étape 5.4 :
 Coller ici les sorties de `curl` **avant** puis **après** `--build` (étape 5.5) :
 
 ```
-(coller ici les deux sorties)
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : Bonjour depuis Docker Compose!
+RawContent        : HTTP/1.1 200 OK
+                    Connection: close
+                    Content-Length: 30
+                    Content-Type: text/html; charset=utf-8
+                    Date: Mon, 02 Nov 2026 18:36:20 GMT
+                    Server: Werkzeug/3.1.9 Python/3.11.18
+
+                    Bonjour depuis Docker Comp...
+Forms             : {}
+Headers           : {[Connection, close], [Content-Length, 30], [Content-Type, text/html; charset=utf-8], [Date, Mon, 02 Nov 2026 18:36:20
+                    GMT]...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 30
+
+StatusCode        : 200
+StatusDescription : OK
+Content           : Modification testée avec succès
+RawContent        : HTTP/1.1 200 OK
+                    Connection: close
+                    Content-Length: 33
+                    Content-Type: text/html; charset=utf-8
+                    Date: Mon, 02 Nov 2026 18:37:23 GMT
+                    Server: Werkzeug/3.1.9 Python/3.11.18
+
+                    Modification testée avec s...
+Forms             : {}
+Headers           : {[Connection, close], [Content-Length, 33], [Content-Type, text/html; charset=utf-8], [Date, Mon, 02 Nov 2026 18:37:23
+                    GMT]...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 33
+
 ```
 
 ### Q5.1 — Quelle est la différence entre `image: postgres:15` et `build: ./api` ?
 
 **Réponse :**
 
-*(écrire votre réponse ici)*
-
+image: postgres:15 télécharge et utilise une image pré-construite depuis un registre (Docker Hub). build: ./api demande à Docker de construire une nouvelle image localement à partir du code source et du Dockerfile situés dans le dossier ./api.
 ### Q5.2 — À quoi sert `depends_on: - db` ? Garantit-il que la base est prête, ou seulement que son conteneur a été démarré avant ?
 
 **Réponse :**
 
-*(écrire votre réponse ici)*
+Cela indique à Docker Compose de démarrer le conteneur db avant le conteneur api. Cela garantit uniquement que le conteneur db est démarré, mais pas que le service PostgreSQL à l'intérieur est entièrement initialisé et prêt à accepter des connexions.
 
 ### Q5.3 — Pourquoi `docker compose up -d` seul n'a-t-il pas pris en compte la modification de `app.py` ? Quelle option faut-il ajouter ?
 
 **Réponse :**
 
-*(écrire votre réponse ici)*
+Il n'a pas pris en compte la modification car il a utilisé l'image déjà construite (mise en cache). Il faut ajouter l'option --build (commande : docker compose up -d --build) pour forcer la reconstruction de l'image avec le nouveau code.
 
 ---
 
@@ -277,7 +316,9 @@ Coller ici les sorties de `curl` **avant** puis **après** `--build` (étape 5.5
 Coller ici la sortie de `docker volume ls` (étape 6.1) :
 
 ```
-(coller ici la sortie)
+DRIVER    VOLUME NAME
+local     d785cadfc68f7a3cb9b1b72626c5117393753f1dff06ba539b61c2f3518a80a2
+local     tp5-compose_data_db
 ```
 
 ### Trace 6.2 — vérification finale
@@ -285,14 +326,28 @@ Coller ici la sortie de `docker volume ls` (étape 6.1) :
 Coller ici les sorties de `docker ps -a`, `docker volume ls` et `docker network ls` (étape 6.3), après `docker compose down -v` :
 
 ```
-(coller ici les sorties)
+CONTAINER ID   IMAGE         COMMAND    CREATED        STATUS                    PORTS     NAMES
+744d15f7a541   hello-world   "/hello"   29 hours ago   Exited (0) 29 hours ago             infallible_keldysh
+
+DRIVER    VOLUME NAME
+local     d785cadfc68f7a3cb9b1b72626c5117393753f1dff06ba539b61c2f3518a80a2
+
+NETWORK ID     NAME      DRIVER    SCOPE
+30b582fbbb13   bridge    bridge    local
+c41e533e4875   host      host      local
+837660030ba1   none      null      local
+
+PS C:\Users\fghjklmù\tp5-compose> docker compose down -v
+[+] down 1/1
+ ✔️ Volume tp5-compose_data_db Removed
+
 ```
 
 ### Q6.1 — Quelle option de `docker compose down` supprime les volumes ? Pourquoi doit-on l'utiliser avec précaution pour une base de données réelle ?
 
 **Réponse :**
 
-*(écrire votre réponse ici)*
+L'option -v (ou --volumes) supprime les volumes nommés déclarés dans le fichier Compose. On doit l'utiliser avec une extrême précaution en production car elle efface définitivement toutes les données de la base de données (utilisateurs, commandes, etc.), ce qui est irréversible sans sauvegarde préalable.
 
 ---
 
@@ -301,13 +356,38 @@ Coller ici les sorties de `docker ps -a`, `docker volume ls` et `docker network 
 ### `docker-compose.yml` final
 
 ```yaml
-(coller ici le contenu de votre docker-compose.yml)
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - data_db:/var/lib/postgresql/data
+  adminer:
+    image: adminer
+    ports:
+      - "8081:8080"
+  api:
+    build: ./api
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+volumes:
+  data_db:
 ```
 
 ### `api/Dockerfile`
 
 ```dockerfile
-(coller ici le contenu de votre Dockerfile)
+FROM python:3.11-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+COPY . .
+EXPOSE 5000
+CMD ["python", "app.py"]
 ```
 
 ### Fichier `.env` (nom de la variable uniquement, **sans la valeur**)
@@ -322,7 +402,7 @@ POSTGRES_PASSWORD=********
 
 Comparer le lancement de l'application avec Docker Compose et avec les commandes `docker run` du TP n°4 : qu'est-ce qui est plus simple ? Qu'est-ce qui reste à votre avis difficile ?
 
-*(écrire votre conclusion ici)*
+Docker Compose simplifie considérablement la gestion de plusieurs conteneurs par rapport aux longues commandes docker run du TP4. Un seul fichier YAML décrit l'ensemble de l'architecture (services, réseaux, volumes, variables d'environnement), ce qui rend le projet reproductible et partageable. Les commandes up, down, logs et ps remplacent avantageusement les multiples docker run, docker stop, docker rm et docker network create. Enfin, Compose gère automatiquement le réseau interne entre services, ce qui facilite grandement la communication entre conteneurs.
 
 ---
 
@@ -330,9 +410,9 @@ Comparer le lancement de l'application avec Docker Compose et avec les commandes
 
 Cocher les cases (remplacer `[ ]` par `[x]`) :
 
-- [ ] Mon `docker-compose.yml` démarre les trois services (`db`, `adminer`, `api`) avec une seule commande
-- [ ] J'ai vérifié que les données de la base survivent à `docker compose down`
-- [ ] Je sais expliquer pourquoi un service joint un autre par son nom
-- [ ] J'ai répondu à toutes les questions (Q1.1 à Q6.1) avec mes propres mots
-- [ ] J'ai collé toutes les traces demandées et ajouté la capture d'Adminer
-- [ ] Je n'ai pas inclus mon vrai fichier `.env`
+- [x] Mon `docker-compose.yml` démarre les trois services (`db`, `adminer`, `api`) avec une seule commande
+- [x] J'ai vérifié que les données de la base survivent à `docker compose down`
+- [x] Je sais expliquer pourquoi un service joint un autre par son nom
+- [x] J'ai répondu à toutes les questions (Q1.1 à Q6.1) avec mes propres mots
+- [x] J'ai collé toutes les traces demandées et ajouté la capture d'Adminer
+- [x] Je n'ai pas inclus mon vrai fichier `.env`
