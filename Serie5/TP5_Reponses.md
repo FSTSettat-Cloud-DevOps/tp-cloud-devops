@@ -5,10 +5,10 @@
 
 | | |
 |---|---|
-| **Nom** | *(à compléter)* |
-| **Prénom** | *(à compléter)* |
+| **Nom** | *Boughija_jemi* |
+| **Prénom** | *Nada_Meriem* |
 | **Groupe / Filière** | *(à compléter)* |
-| **Date** | *(à compléter)* |
+| **Date** | *02/11/2026* |
 
 ---
 
@@ -32,26 +32,35 @@
 Coller ici la sortie de `docker compose ps` (étape 1.4, service démarré) :
 
 ```
-(coller ici la sortie)
+
+CONTAINER ID   IMAGE         COMMAND    CREATED       STATUS                   PORTS     NAMES
+744d15f7a541   hello-world   "/hello"   2 hours ago   Exited (0) 2 hours ago             infallible_keldysh
+PS C:\Users\fghjklmù> docker compose version
+Docker Compose version v5.6.0
 ```
 
 Coller ici la sortie de `docker network ls` (étape 1.4) :
 
 ```
-(coller ici la sortie)
+NETWORK ID     NAME                  DRIVER    SCOPE
+a7fda918d13d   bridge                bridge    local
+c41e533e4875   host                  host      local
+837660030ba1   none                  null      local
+40c40a72a9f0   tp5-compose_default   bridge    local
 ```
 
 ### Q1.1 — En plus du conteneur, quel autre objet Docker a été créé par `docker compose up` ? Quel est son nom ?
 
 **Réponse :**
 
-*(écrire votre réponse ici)*
+Un réseau Docker a été créé automatiquement. Son nom est tp5-compose_default (format : nomdudossier_default).
 
 ### Q1.2 — Quelle est la différence entre `docker compose stop` et `docker compose down` ?
 
 **Réponse :**
 
-*(écrire votre réponse ici)*
+docker compose stop : arrête les conteneurs mais les conserve (on peut les redémarrer avec docker compose start).
+docker compose down : arrête ET supprime les conteneurs + le réseau créé. Les données non volumées sont perdues.
 
 ---
 
@@ -62,27 +71,26 @@ Coller ici la sortie de `docker network ls` (étape 1.4) :
 Coller ici la sortie de `docker compose ps` (étape 2.2) :
 
 ```
-(coller ici la sortie)
+NAME                    IMAGE         COMMAND                  SERVICE   CREATED          STATUS          PORTS
+tp5-compose-adminer-1   adminer       "entrypoint.sh docke…"   adminer   32 seconds ago   Up 28 seconds   0.0.0.0:8081->8080/tcp, [::]:8081->8080/tcp
+tp5-compose-db-1        postgres:15   "docker-entrypoint.s…"   db        32 seconds ago   Up 28 seconds   5432/tcp
 ```
 
 ### Trace 2.2 — capture d'Adminer
 
 Capture d'écran d'Adminer connecté à la base (étape 2.4) :
 
-![Capture Adminer connecté à PostgreSQL](images/partie2_adminer.png)
-
+<img width="1583" height="617" alt="partie2_adminer png" src="https://github.com/user-attachments/assets/1ca48c9f-819a-45c2-a105-6643c7fb1180" />
 ### Q2.1 — Dans Adminer, pourquoi écrit-on `db` comme serveur et non `localhost` ?
 
 **Réponse :**
 
-*(écrire votre réponse ici)*
-
+Parce que les services Docker Compose communiquent entre eux via le réseau Docker interne créé automatiquement. Chaque service est joignable par son nom de service (ici db) qui est résolu en adresse IP par le DNS interne de Docker. localhost pointerait vers le conteneur Adminer lui-même, pas vers la base de données.
 ### Q2.2 — Lequel de ces deux services publie un port vers l'hôte ? Pourquoi le service `db` n'en a-t-il pas besoin ici ?
 
 **Réponse :**
 
-*(écrire votre réponse ici)*
-
+Seul le service adminer publie un port (8081:8080) car c'est lui qui doit être accessible depuis le navigateur Windows. Le service db n'a pas besoin de publier de port car il n'est utilisé que par Adminer (et potentiellement d'autres services) via le réseau interne Docker. Exposer la base de données directement sur l'hôte serait un risque de sécurité inutile.
 ---
 
 ## Partie 3 — Conserver les données avec un volume
@@ -92,7 +100,11 @@ Capture d'écran d'Adminer connecté à la base (étape 2.4) :
 Coller ici la sortie du dernier `SELECT * FROM etudiants;` de l'étape 3.3 :
 
 ```
-(coller ici la sortie)
+PS C:\Users\fghjklmù\tp5-compose> docker compose exec db psql -U postgres -c "SELECT * FROM etudiants;"
+ id | nom
+----+------
+  1 | Sara
+(1 row)
 ```
 
 ### Trace 3.2 — données après `docker compose down` puis `up`
@@ -100,7 +112,11 @@ Coller ici la sortie du dernier `SELECT * FROM etudiants;` de l'étape 3.3 :
 Coller ici la sortie du `SELECT * FROM etudiants;` de l'étape 3.4 :
 
 ```
-(coller ici la sortie)
+PS C:\Users\fghjklmù\tp5-compose> docker compose exec db psql -U postgres -c "SELECT * FROM etudiants;"
+ id | nom
+----+------
+  1 | Sara
+(1 row)
 ```
 
 ### Trace 3.3 — volumes existants
@@ -108,20 +124,22 @@ Coller ici la sortie du `SELECT * FROM etudiants;` de l'étape 3.4 :
 Coller ici la sortie de `docker volume ls` (étape 3.5) :
 
 ```
-(coller ici la sortie)
+DRIVER    VOLUME NAME
+local     d785cadfc68f7a3cb9b1b72626c5117393753f1dff06ba539b61c2f3518a80a2
+local     tp5-compose_data_db
 ```
 
 ### Q3.1 — Pourquoi les données sont-elles toujours là après `docker compose down` puis `up` ?
 
 **Réponse :**
 
-*(écrire votre réponse ici)*
+Parce que les données de PostgreSQL sont stockées dans un volume Docker nommé (data_db) qui est indépendant du cycle de vie des conteneurs. docker compose down supprime les conteneurs et le réseau, mais pas les volumes nommés. Quand le conteneur est recréé, il remonte le même volume et retrouve les données.
 
 ### Q3.2 — Que se serait-il passé sans la ligne `volumes` dans le service `db` ?
 
 **Réponse :**
 
-*(écrire votre réponse ici)*
+Sans volume, les données auraient été stockées dans le système de fichiers éphémère du conteneur. Après docker compose down, le conteneur est supprimé et toutes les données sont perdues définitivement 
 
 ---
 
@@ -132,21 +150,49 @@ Coller ici la sortie de `docker volume ls` (étape 3.5) :
 Coller ici la sortie de `docker compose config` (étape 4.3). **Masquer le mot de passe** si ce n'est pas la valeur d'exemple :
 
 ```
-(coller ici la sortie)
+name: tp5-compose
+services:
+  adminer:
+    image: adminer
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        published: "8081"
+        protocol: tcp
+  db:
+    environment:
+      POSTGRES_PASSWORD: secret
+    image: postgres:15
+    networks:
+      default: null
+    volumes:
+      - type: volume
+        source: data_db
+        target: /var/lib/postgresql/data
+        volume: {}
+networks:
+  default:
+    name: tp5-compose_default
+volumes:
+  data_db:
+    name: tp5-compose_data_db
 ```
 
 ### Q4.1 — Quel est l'intérêt d'un fichier `.env` plutôt que d'écrire le mot de passe dans `docker-compose.yml` ?
 
 **Réponse :**
 
-*(écrire votre réponse ici)*
+L'utilisation d'un fichier .env permet de séparer la configuration sensible du code. Cela offre deux avantages majeurs :
+Sécurité : Les mots de passe et secrets ne sont pas écrits en clair dans le fichier docker-compose.yml.
+Flexibilité : On peut adapter facilement les variables d'environnement (comme le mot de passe ou le port) selon l'environnement (développement, test, production) sans avoir à modifier le fichier YAML lui-même.
 
 ### Q4.2 — Pourquoi ne faut-il pas envoyer le fichier `.env` sur un dépôt Git partagé ?
 
 **Réponse :**
 
-*(écrire votre réponse ici)*
-
+Le fichier .env contient des informations sensibles en clair (comme les mots de passe, clés API, etc.). S'il est poussé sur un dépôt Git public ou partagé, n'importe qui ayant accès au dépôt pourrait récupérer ces identifiants et compromettre la sécurité de la base de données ou du système. C'est pour cette raison qu'on l'ajoute systématiquement au fichier .gitignore.
 ---
 
 ## Partie 5 — Ajouter sa propre application
@@ -156,7 +202,10 @@ Coller ici la sortie de `docker compose config` (étape 4.3). **Masquer le mot d
 Coller ici la sortie de `docker compose ps` (étape 5.3) :
 
 ```
-(coller ici la sortie)
+NAME                    IMAGE             COMMAND                  SERVICE   CREATED          STATUS          PORTS
+tp5-compose-adminer-1   adminer           "entrypoint.sh docke…"   adminer   41 minutes ago   Up 41 minutes   0.0.0.0:8081->8080/tcp, [::]:8081->8080/tcp
+tp5-compose-api-1       tp5-compose-api   "python app.py"          api       24 seconds ago   Up 22 seconds   0.0.0.0:5000->5000/tcp, [::]:5000->5000/tcp
+tp5-compose-db-1        postgres:15       "docker-entrypoint.s…"   db        41 minutes ago   Up 41 minutes   5432/tcp
 ```
 
 ### Trace 5.2 — réponse de l'API
@@ -164,7 +213,25 @@ Coller ici la sortie de `docker compose ps` (étape 5.3) :
 Coller ici la sortie de `curl http://localhost:5000` (étape 5.3) :
 
 ```
-(coller ici la sortie)
+StatusCode        : 200
+StatusDescription : OK
+Content           : Bonjour depuis Docker Compose!
+RawContent        : HTTP/1.1 200 OK
+                    Connection: close
+                    Content-Length: 30
+                    Content-Type: text/html; charset=utf-8
+                    Date: Mon, 02 Nov 2026 17:44:00 GMT
+                    Server: Werkzeug/3.1.9 Python/3.11.18
+
+                    Bonjour depuis Docker Comp...
+Forms             : {}
+Headers           : {[Connection, close], [Content-Length, 30], [Content-Type, text/html; charset=utf-8], [Date, Mon, 02 Nov 2026 17:44:00
+                    GMT]...}
+Images            : {}
+InputFields       : {}
+Links             : {}
+ParsedHtml        : mshtml.HTMLDocumentClass
+RawContentLength  : 30
 ```
 
 ### Trace 5.3 — résolution du nom `db`
@@ -172,7 +239,7 @@ Coller ici la sortie de `curl http://localhost:5000` (étape 5.3) :
 Coller ici la sortie de la commande de l'étape 5.4 :
 
 ```
-(coller ici la sortie)
+172.18.0.3
 ```
 
 ### Trace 5.4 — effet de `--build`
