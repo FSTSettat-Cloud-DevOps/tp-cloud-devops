@@ -1,14 +1,16 @@
 # Cloud Computing & DevOps
 ## Série 1 --- Caractéristiques du Cloud et étude de cas de migration
+
 **Master Sciences et Techniques** | Faculté des Sciences et Techniques de Settat  
 **Enseignant :** Pr. A. Abassi  
 
 ---
 
 ### 👤 Informations du Binôme
-* **Étudiant 1 :** [Nom, Prénom, CNE]
-* **Étudiant 2 :** [Nom, Prénom, CNE]
-* **Groupe :** [Groupe]
+
+* **Étudiant 1 :** [BOUGHIJA, NADA, E138193253]
+* **Étudiant 2 :** [JEMI, MERIEM, E132132754]
+* **Groupe :** [IRISTI]
 * **Lien du dépôt GitHub :** [URL du dépôt monorepo]
 
 ---
@@ -37,11 +39,11 @@ Pour chaque situation, indiquer la caractéristique du Cloud illustrée (*libre-
 * **(e)** Plusieurs clients différents partagent le même parc physique sans voir les données des autres.
 
 > **Réponse Exercice 1 :**
-> * **(a)** 
-> * **(b)** 
-> * **(c)** 
-> * **(d)** 
-> * **(e)** 
+> * **(a)** Libre-service à la demande.
+> * **(b)** Service mesuré.
+> * **(c)** Accès réseau étendu.
+> * **(d)** Élasticité rapide.
+> * **(e)** Mutualisation des ressources.
 
 ---
 
@@ -55,10 +57,10 @@ Associer chaque énoncé au concept le plus adapté et justifier :
 * **(d)** Expliquer la différence entre *scalabilité verticale* (scale up) et *horizontale* (scale out) avec un exemple.
 
 > **Réponse Exercice 2 :**
-> * **(a)** 
-> * **(b)** 
-> * **(c)** 
-> * **(d)** 
+> * **(a)** **Scalabilité.** Le système peut prendre en charge davantage d'utilisateurs en ajoutant des machines.
+> * **(b)** **Élasticité.** Le système ajoute automatiquement des ressources quand la charge augmente et les retire quand elle diminue.
+> * **(c)** **Disponibilité.** Le taux de 99,95 % représente la proportion du temps pendant laquelle le service répond. En cas de panne, un autre serveur peut prendre le relais.
+> * **(d)** La **scalabilité verticale** (*scale up*) augmente les ressources d'une même machine, par exemple en passant de 8 à 16 Go de RAM. La **scalabilité horizontale** (*scale out*) ajoute des machines, par exemple en passant de 1 à 3 serveurs derrière un répartiteur de charge.
 
 ---
 
@@ -72,10 +74,10 @@ Pour chaque organisation, proposer un modèle (*public, privé, hybride, communa
 * **(d)** Un consortium d'universités marocaines qui mutualise une plateforme de calcul pour la recherche.
 
 > **Réponse Exercice 3 :**
-> * **(a)** 
-> * **(b)** 
-> * **(c)** 
-> * **(d)** 
+> * **(a)** **Cloud public.** La startup peut lancer son application rapidement avec peu d'investissement initial. Elle paie selon sa consommation et augmente ses ressources si le nombre d'utilisateurs grandit.
+> * **(b)** **Cloud hybride.** La faculté conserve les données sensibles dans un Cloud privé. Elle utilise des ressources du Cloud public pour absorber les pics des services qui peuvent y être hébergés.
+> * **(c)** **Cloud privé.** La banque peut contrôler la localisation de ses données et de ses sauvegardes. Elle choisit des centres de données qui respectent les exigences réglementaires applicables.
+> * **(d)** **Cloud communautaire.** Les universités partagent une plateforme réservée aux membres du consortium. Elles mutualisent les coûts et fixent des règles communes d'accès et de sécurité.
 
 ---
 
@@ -91,24 +93,26 @@ L'application ScolaNet gère la scolarité de 2 000 étudiants. Elle tourne sur 
 > **Réponse Exercice 4 :**
 >
 > **1. Problèmes de l'architecture actuelle :**
-> * 
+> * Le serveur physique unique est un point de défaillance unique. Une panne arrête à la fois l'application et la base de données.
+> * L'application et PostgreSQL partagent les mêmes ressources. En période de forte charge, elles peuvent se concurrencer pour le CPU, la RAM et les accès disque.
+> * La capacité du serveur est fixe. Le pic de septembre peut provoquer une saturation, tandis qu'un achat de matériel dimensionné pour ce pic augmente l'investissement initial.
 >
 > **2. Stratégie de migration recommandée et justification :**
-> * 
+> * **Replatform.** Déployer l'application sur des instances Cloud derrière un répartiteur de charge et migrer la base vers un service PostgreSQL managé. Cette stratégie limite les modifications du code, sépare l'application de sa base et permet d'ajuster le nombre d'instances selon la charge. Une configuration redondante améliore la disponibilité, avec des coûts à estimer avant la migration.
 >
 > **3. Risques et mesures d'atténuation :**
-> * **Risque 1 :** 
->   * *Atténuation :* 
-> * **Risque 2 :** 
->   * *Atténuation :* 
-> * **Risque 3 :** 
->   * *Atténuation :* 
+> * **Risque 1 :** Perte ou corruption des données pendant le transfert.
+>   * *Atténuation :* Effectuer une sauvegarde complète, tester sa restauration et vérifier l'intégrité des données migrées.
+> * **Risque 2 :** Indisponibilité du service pendant la bascule.
+>   * *Atténuation :* Synchroniser les données avant la bascule, choisir une période de faible trafic et préparer un plan de retour arrière.
+> * **Risque 3 :** Accès non autorisé aux données des étudiants.
+>   * *Atténuation :* Placer PostgreSQL sur un réseau privé, limiter les accès et chiffrer les données pendant leur transfert et leur stockage.
 >
 > **4. Plan de migration en 4 phases :**
-> * **Phase 1 :** 
-> * **Phase 2 :** 
-> * **Phase 3 :** 
-> * **Phase 4 :** 
+> * **Phase 1 :** Auditer l'existant. Recenser les dépendances, mesurer la charge et définir les besoins de disponibilité, de sécurité et de budget.
+> * **Phase 2 :** Préparer l'environnement Cloud. Configurer le réseau privé, PostgreSQL managé, le répartiteur de charge et la supervision.
+> * **Phase 3 :** Réaliser une migration de test. Restaurer une copie de la base et vérifier le fonctionnement de l'application, les performances sous une charge de pointe et le plan de retour arrière.
+> * **Phase 4 :** Basculer en production hors période de pointe après la synchronisation finale. Vérifier le service, puis surveiller les performances et les coûts.
 
 ---
 
@@ -125,10 +129,10 @@ Relever les ressources de votre poste de travail :
 >
 > | Ressource | Valeur mesurée |
 > | :--- | :--- |
-> | **Nombre de cœurs CPU** | |
-> | **RAM Totale** | |
-> | **Espace disque libre (/ ou C:)** | |
-> | **Adresse(s) IP** | |
+> | **Nombre de cœurs CPU** | 4 cœurs physiques (8 processeurs logiques) |
+> | **RAM Totale** |Environ 7,85 Gio visibles par Windows |
+> | **Espace disque libre (/ ou C:)** |	18,99 Go|
+> | **Adresse(s) IP** |Wi-Fi : 10.223.249.83/24 ; Ethernet : 192.168.1.200/24|
 
 ---
 
@@ -152,3 +156,7 @@ print("Serveurs (statique)      :", statique)
 print("Serveur-heures statique  :", h_statique, "->", h_statique * PRIX, "EUR")
 print("Serveur-heures elastique :", h_elastique, "->", h_elastique * PRIX, "EUR")
 print("Economie : %.1f %%" % (100 * (1 - h_elastique / h_statique)))
+```
+
+
+> L'infrastructure statique mobilise 7 serveurs pendant 24 heures pour couvrir le pic de 700 requêtes/s. L'infrastructure élastique ajuste le nombre de serveurs chaque heure, ce qui permet d'économiser **39 € sur la journée simulée**.
